@@ -1,7 +1,9 @@
 package komarov.springcourse;
 
 import komarov.springcourse.entities.orders.Food;
+import komarov.springcourse.entities.users.User;
 import komarov.springcourse.repos.FoodRepository;
+import komarov.springcourse.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,8 @@ import java.util.Map;
 public class GreetingController {
     @Autowired
     private FoodRepository foodRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/greeting")
     public String greeting(
@@ -25,7 +29,7 @@ public class GreetingController {
         return "greeting";
     }
 
-    @GetMapping
+    @GetMapping("/food")
     public String main(Map<String, Object> model) {
         Iterable<Food> foods = foodRepository.findAll();
 
@@ -33,9 +37,9 @@ public class GreetingController {
         return "main";
     }
 
-    @PostMapping
-    public String add(@RequestParam String foodName, Map<String, Object> model) {
-        Food food = new Food(foodName);
+    @PostMapping("/food")
+    public String add(@RequestParam String foodName, @RequestParam String foodCost, Map<String, Object> model) {
+        Food food = new Food(foodName, foodCost);
 
         foodRepository.save(food);
 
@@ -46,7 +50,7 @@ public class GreetingController {
         return "main";
     }
 
-    @PostMapping("filter")
+    @PostMapping("/food/filter")
     public String filter(@RequestParam String filter, Map<String, Object> model) {
         Iterable<Food> foods;
 
@@ -59,5 +63,42 @@ public class GreetingController {
         model.put("foods", foods);
 
         return "main";
+    }
+
+    @GetMapping("/user")
+    public String userMain(Map<String, Object> model) {
+        Iterable<User> users = userRepository.findAll();
+
+        model.put("users", users);
+        return "user";
+    }
+
+    @PostMapping("/user")
+    public String userAdd(@RequestParam String login, @RequestParam String password, @RequestParam String userName,
+                          @RequestParam String role, Map<String, Object> model) {
+        User user = new User(login, password, userName, role);
+
+        userRepository.save(user);
+
+        Iterable<User> users = userRepository.findAll();
+
+        model.put("users", users);
+
+        return "user";
+    }
+
+    @PostMapping("/user/filter")
+    public String userFilter(@RequestParam String filter, Map<String, Object> model) {
+        Iterable<User> users;
+
+        if (filter != null && !filter.isEmpty()) {
+            users = userRepository.findByUserName(filter);
+        } else {
+            users = userRepository.findAll();
+        }
+
+        model.put("users", users);
+
+        return "user";
     }
 }

@@ -3,12 +3,13 @@
 <body>
 <div>
     <form method="post">
-        <input type="text" name="name" placeholder="Enter food name" />
+        <input type="text" name="foodName" placeholder="Enter food name" />
+        <input type="text" name="foodCost" placeholder="Enter food cost" />
         <button type="submit">Add</button>
     </form>
 </div>
 <div>Food list</div>
-<form method="post" action="filter">
+<form method="post" action="food/filter">
     <input type="text" name="filter">
     <button type="submit">Find</button>
 </form>
@@ -16,6 +17,7 @@
 <div>
     <b>{{id}}</b>
     <span>{{foodName}}</span>
+    <span>{{foodCost}}</span>
 </div>
 {{/foods}}
 </body>

@@ -12,6 +12,7 @@ public class Food {
     private Integer id;
 
     private String foodName;
+    private float foodCost;
 
     public Food() {
 
@@ -20,6 +21,11 @@ public class Food {
     public Food(Integer id, String name) {
         this.id = id;
         this.foodName = name;
+    }
+
+    public Food(String name, String cost) {
+        this.foodName = name;
+        this.foodCost = Float.parseFloat(cost);
     }
 
     public Food(String name) {
@@ -52,5 +58,13 @@ public class Food {
 
     public void setName(String name) {
         this.foodName = name;
+    }
+
+    public float getFoodCost() {
+        return foodCost;
+    }
+
+    public void setFoodCost(float foodCost) {
+        this.foodCost = foodCost;
     }
 }
