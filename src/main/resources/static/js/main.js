@@ -6,7 +6,7 @@ Vue.component('message-row', {
 Vue.component('messages-list', {
     props: ['messages'],
     template:
-        '<div>' +
+        '<div id="app">' +
         '<message-row v-for="message in messages" :key="message.id" :message="message" />' +
         '</div>'
 });
