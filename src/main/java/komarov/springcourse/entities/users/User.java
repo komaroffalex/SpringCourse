@@ -2,43 +2,23 @@ package komarov.springcourse.entities.users;
 
 import komarov.springcourse.entities.Role;
 import komarov.springcourse.entities.Status;
-import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
-@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "user")
 @DiscriminatorColumn(name="typeUser",
         discriminatorType = DiscriminatorType.INTEGER)
 public class User {
     @Id
-    private Integer id;
+    @GeneratedValue
+    private Long id;
     private String login;
     private String password;
     private String userName;
     @Column(name="typeUser",insertable=false, updatable=false)
     private int typeUser;
-
-    public User() {
-
-    }
-
-    public User(String login, String password, String userName, int typeUser) {
-        this.login = login;
-        this.password = password;
-        this.userName = userName;
-        this.typeUser = typeUser;
-    }
-
-    public User(int id, String login, String password, String userName, int typeUser) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
-        this.userName = userName;
-        this.typeUser = typeUser;
-    }
 
     public int getTypeUser() {
         return this.typeUser;
@@ -72,11 +52,11 @@ public class User {
         this.login = login;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

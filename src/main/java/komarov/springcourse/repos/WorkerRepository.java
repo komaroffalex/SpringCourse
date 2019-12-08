@@ -12,5 +12,4 @@ public interface WorkerRepository extends UserRepository<Worker> {
 
     @Query("select U from Worker U where U.login = :login and TypeUser = 2")
     Optional<Worker> getWorkerByLogin(@Param("login") String login);
-
 }

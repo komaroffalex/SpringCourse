@@ -14,24 +14,6 @@ public class Food {
     private String foodName;
     private float foodCost;
 
-    public Food() {
-
-    }
-
-    public Food(Integer id, String name) {
-        this.id = id;
-        this.foodName = name;
-    }
-
-    public Food(String name, String cost) {
-        this.foodName = name;
-        this.foodCost = Float.parseFloat(cost);
-    }
-
-    public Food(String name) {
-        this.foodName = name;
-    }
-
     @Override
     public int hashCode() {
         return id;

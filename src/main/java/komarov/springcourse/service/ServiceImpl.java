@@ -1,5 +1,6 @@
 package komarov.springcourse.service;
 
+import komarov.springcourse.entities.Role;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.Worker;
@@ -9,6 +10,9 @@ import komarov.springcourse.repos.FoodRepository;
 import komarov.springcourse.repos.WorkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotNull;
+import java.util.NoSuchElementException;
 
 @Service
 public class ServiceImpl {
@@ -35,6 +39,27 @@ public class ServiceImpl {
             return 2;
         }
         return -1;
+    }
+
+    /**
+     * Find user in the DB.
+     *
+     * @param userId specifies user's ID
+     * @return user entity
+     */
+    public Administrator findUser(@NotNull final String userId) throws NoSuchElementException {
+        return administratorRepository.findById(Long.parseLong(userId)).orElseThrow(()
+                -> new NoSuchElementException("User is not present!"));
+    }
+
+    public Long upsertUser(@NotNull final String login, @NotNull final String password,
+                           @NotNull final String username) {
+        final Administrator testUsr1 = new Administrator();
+        testUsr1.setLogin(login);
+        testUsr1.setPassword(password);
+        testUsr1.setUserName(username);
+        testUsr1.seTypeUser(Role.ADMINISTRATOR.getRoleId());
+        return administratorRepository.save(testUsr1).getId();
     }
 
     public boolean loginClient(String login, String pwd) {

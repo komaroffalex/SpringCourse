@@ -3,7 +3,6 @@ package komarov.springcourse.entities.orders;
 import komarov.springcourse.entities.Status;
 import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.Worker;
-import lombok.Data;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Orders")
-@Data
 public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -30,19 +28,6 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "clientId")
     private Client client;
-
-    public Order() {
-
-    }
-
-    public Order(String deliveryTime, List<Food> food, float cost, String address,
-                 Status orderStatus){
-        this.deliveryTime = deliveryTime;
-        this.food = getFoodAsString(food);
-        this.cost = cost;
-        this.address = address;
-        this.orderStatus = orderStatus;
-    }
 
     private String getFoodAsString(List<Food> food){
         List<String> foodNames = new ArrayList<>();
