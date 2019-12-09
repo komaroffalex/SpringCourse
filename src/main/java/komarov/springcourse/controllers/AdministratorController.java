@@ -60,6 +60,26 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Delete user by the specified ID.
+     *
+     * @param id user's ID
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeUserById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteUser(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @RequestMapping(value = "/user", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

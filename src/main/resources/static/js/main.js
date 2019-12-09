@@ -25,6 +25,9 @@ Vue.component('message-form', {
                     this.password + '&username=' + this.username).then(result =>
                 result.json().then(data => {
                     console.log(data);
+                    this.login = '';
+                    this.password = '';
+                    this.username = '';
                 })
             );
         }
@@ -33,9 +36,20 @@ Vue.component('message-form', {
 });
 
 Vue.component('message-row', {
-    props: ['message'],
+    props: ['message', 'messages'],
     template: '<div><i>({{message.id}})</i> <i>({{message.login}})</i> ' +
-                '<i>({{message.password}})</i> <i>({{message.userName}})</i></div>'
+                '<i>({{message.password}})</i> <i>({{message.userName}})</i>' +
+                '<span>' + '<input type="button" value="X" v-on:click="del" />' + '</span>' + '</div>',
+    methods: {
+        del: function(){
+            messageApiGet.remove({id: this.message.id}).then(result => {
+                if(result.ok) {
+                    this.messages.splice(this.messages.indexOf(this.message), 1);
+                    console.log(result.status)
+                }
+            })
+        }
+    }
 });
 
 Vue.component('messages-list', {
@@ -43,7 +57,7 @@ Vue.component('messages-list', {
     template:
         '<div id="app">' +
         '<message-form :messages="messages" />' +
-        '<message-row v-for="message in messages" :key="message.id" :message="message" />' +
+        '<message-row v-for="message in messages" :key="message.id" :message="message" :messages="messages" />' +
         '</div>',
     created: function() {
         messageApiGetAll.get({}).then(result => {
