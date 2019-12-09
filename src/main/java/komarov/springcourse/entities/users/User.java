@@ -23,7 +23,7 @@ public class User {
         return this.typeUser;
     }
 
-    public void seTypeUser(int typeUser) {
+    public void setTypeUser(int typeUser) {
         this.typeUser = typeUser;
     }
 

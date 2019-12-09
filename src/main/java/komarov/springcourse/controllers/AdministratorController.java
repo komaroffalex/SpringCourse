@@ -25,6 +25,22 @@ public class AdministratorController {
     }
 
     /**
+     * Get all users.
+     *
+     * @return list of all users
+     */
+    @RequestMapping(value = "/user/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Administrator>> getAllUsers() {
+        try {
+            return new ResponseEntity<>(service.getAllAdministrators(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * Get user by the specified ID.
      *
      * @param id user's ID

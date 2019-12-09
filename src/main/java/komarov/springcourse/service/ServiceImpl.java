@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -52,13 +53,17 @@ public class ServiceImpl {
                 -> new NoSuchElementException("User is not present!"));
     }
 
+    public List<Administrator> getAllAdministrators() throws NoSuchElementException {
+        return administratorRepository.findAll();
+    }
+
     public Long upsertUser(@NotNull final String login, @NotNull final String password,
                            @NotNull final String username) {
         final Administrator testUsr1 = new Administrator();
         testUsr1.setLogin(login);
         testUsr1.setPassword(password);
         testUsr1.setUserName(username);
-        testUsr1.seTypeUser(Role.ADMINISTRATOR.getRoleId());
+        testUsr1.setTypeUser(Role.ADMINISTRATOR.getRoleId());
         return administratorRepository.save(testUsr1).getId();
     }
 
