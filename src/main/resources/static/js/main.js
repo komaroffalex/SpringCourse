@@ -1,5 +1,6 @@
 var messageApiGet = Vue.resource('/user?id={id}');
 var messageApiGetAll = Vue.resource('/user/all');
+var newPage = Vue.resource('/user/page');
 var messageApiPut = Vue.resource('/user?login={login}&password={password}&username={username}');
 
 Vue.component('message-form', {
@@ -58,6 +59,7 @@ Vue.component('messages-list', {
         '<div id="app">' +
         '<message-form :messages="messages" />' +
         '<message-row v-for="message in messages" :key="message.id" :message="message" :messages="messages" />' +
+        '<span>' + '<input type="button" value="Admin Page" v-on:click="newpage" />' + '</span>' +
         '</div>',
     created: function() {
         messageApiGetAll.get({}).then(result => {
@@ -65,7 +67,13 @@ Vue.component('messages-list', {
                 data.forEach(message => this.messages.push(message))
             )
         });
+    },
+    methods: {
+        newpage: function(){
+            location.replace("administrator.html")
+        }
     }
+
 });
 
 var app = new Vue({

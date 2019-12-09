@@ -24,6 +24,11 @@ public class AdministratorController {
         this.service = service;
     }
 
+    @RequestMapping("/user/page")
+    public String adminPage() {
+        return "administrator.html";
+    }
+
     /**
      * Get all users.
      *
