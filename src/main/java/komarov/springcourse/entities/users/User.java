@@ -1,7 +1,6 @@
 package komarov.springcourse.entities.users;
 
 import komarov.springcourse.entities.Role;
-import komarov.springcourse.entities.Status;
 
 import javax.persistence.*;
 
@@ -71,7 +70,7 @@ public class User {
         return false;
     }
 
-    public Status getTypeUserClass() {
-        return Status.valueOf(this.typeUser);
+    public Role getTypeUserClass() {
+        return Role.valueOf(this.typeUser);
     }
 }
