@@ -6,11 +6,19 @@
 </head>
 <body>
 <h3>Index Page </h3>
-<button type="button" onclick="clickHandler()">Admin page</button>
+<button type="button" onclick="clickAdmin()">Admin page</button>
+<button type="button" onclick="clickClient()">Client page</button>
+<button type="button" onclick="clickWorker()">Worker page</button>
 
 <script>
-    function clickHandler() {
+    function clickAdmin() {
         location.replace("administrator.html");
+    }
+    function clickWorker() {
+        location.replace("worker.html");
+    }
+    function clickClient() {
+        location.replace("client.html");
     }
 </script>
 </body>
