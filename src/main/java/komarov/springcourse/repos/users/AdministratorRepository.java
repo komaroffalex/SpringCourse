@@ -1,4 +1,4 @@
-package komarov.springcourse.repos;
+package komarov.springcourse.repos.users;
 
 import komarov.springcourse.entities.users.Administrator;
 import org.springframework.data.jpa.repository.Query;

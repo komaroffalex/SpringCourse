@@ -4,10 +4,10 @@ import komarov.springcourse.entities.Role;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.Worker;
-import komarov.springcourse.repos.AdministratorRepository;
-import komarov.springcourse.repos.ClientRepository;
-import komarov.springcourse.repos.FoodRepository;
-import komarov.springcourse.repos.WorkerRepository;
+import komarov.springcourse.repos.*;
+import komarov.springcourse.repos.users.AdministratorRepository;
+import komarov.springcourse.repos.users.ClientRepository;
+import komarov.springcourse.repos.users.WorkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,26 @@ import java.util.NoSuchElementException;
 
 @Service
 public class ServiceImpl {
+    private TableRepository tableRepository;
     private FoodRepository foodRepository;
+    private OrderRepository orderRepository;
+    private ReservationRepository reservationRepository;
     private AdministratorRepository administratorRepository;
     private WorkerRepository workerRepository;
     private ClientRepository clientRepository;
 
     @Autowired
-    public ServiceImpl(FoodRepository foodRepository, AdministratorRepository administratorRepository, WorkerRepository workerRepository,
-                       ClientRepository clientRepository) {
+    public ServiceImpl(FoodRepository foodRepository, AdministratorRepository administratorRepository,
+                       WorkerRepository workerRepository, ClientRepository clientRepository,
+                       TableRepository tableRepository, ReservationRepository reservationRepository,
+                       OrderRepository orderRepository) {
         this.foodRepository = foodRepository;
         this.administratorRepository = administratorRepository;
         this.workerRepository = workerRepository;
         this.clientRepository = clientRepository;
+        this.orderRepository = orderRepository;
+        this.tableRepository = tableRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public int authenticate(String login, String pwd) {
