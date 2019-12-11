@@ -6,16 +6,14 @@ import komarov.springcourse.entities.users.Worker;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "Orders")
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private int id;
+    private Long id;
     @Column(name = "delTime")
     private String deliveryTime;
     private String food;
@@ -93,11 +91,13 @@ public class Order {
         this.food = food;
     }
 
-    public Integer getId() {
+    public void setFood(List<Food> food) {this.food = getFoodAsString(food);}
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

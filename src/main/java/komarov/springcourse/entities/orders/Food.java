@@ -9,14 +9,14 @@ import javax.persistence.Id;
 public class Food {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String foodName;
     private float foodCost;
 
     @Override
     public int hashCode() {
-        return id;
+        return Long.hashCode(id);
     }
 
     @Override
@@ -26,11 +26,11 @@ public class Food {
         return id == otherFood.getId();
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
