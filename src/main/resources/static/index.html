@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- версия для разработки, отображает полезные предупреждения в консоли -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
 </head>
 <body>
-<h3>Index Page </h3>
+<h3>Login Page </h3>
 <button type="button" onclick="clickAdmin()">Admin page</button>
 <button type="button" onclick="clickClient()">Client page</button>
 <button type="button" onclick="clickWorker()">Worker page</button>
@@ -21,5 +24,7 @@
         location.replace("client.html");
     }
 </script>
+<div id="app">{{message}}</div>
+<script src="js/main.js"></script>
 </body>
 </html>

@@ -10,6 +10,6 @@ import java.util.Optional;
 @Component
 public interface AdministratorRepository extends UserRepository<Administrator> {
 
-    @Query("select U from Administrator U where U.login = :login and TypeUser = 0")
+    @Query("select U from Administrator U where U.login = :login and type_user = 0")
     Optional<Administrator> getAdministratorByLogin(@Param("login") String login);
 }

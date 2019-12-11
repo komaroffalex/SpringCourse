@@ -3,6 +3,7 @@ package komarov.springcourse.service;
 import komarov.springcourse.entities.Role;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.Client;
+import komarov.springcourse.entities.users.User;
 import komarov.springcourse.entities.users.Worker;
 import komarov.springcourse.repos.*;
 import komarov.springcourse.repos.users.AdministratorRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -65,14 +67,38 @@ public class ServiceImpl {
         return administratorRepository.findAll();
     }
 
+    public List<Worker> getAllWorkers() throws NoSuchElementException {
+        return workerRepository.findAll();
+    }
+
+    public List<Client> getAllClients() throws NoSuchElementException {
+        return clientRepository.findAll();
+    }
+
+    public List<User> getAllUsers() throws NoSuchElementException {
+        final List<User> users = new ArrayList<>();
+        users.addAll(getAllAdministrators());
+        users.addAll(getAllWorkers());
+        users.addAll(getAllClients());
+        return users;
+    }
+
     public Long upsertUser(@NotNull final String login, @NotNull final String password,
-                           @NotNull final String username) {
-        final Administrator testUsr1 = new Administrator();
-        testUsr1.setLogin(login);
-        testUsr1.setPassword(password);
-        testUsr1.setUserName(username);
-        testUsr1.setTypeUser(Role.ADMINISTRATOR.getRoleId());
-        return administratorRepository.save(testUsr1).getId();
+                           @NotNull final String username, @NotNull final String role) throws NoSuchElementException {
+        final User usr;
+        switch(role){
+            case "0":
+                usr = new Administrator(login, password, username);
+                return addNewAdministrator((Administrator)usr);
+            case "1":
+                usr = new Client(login, password, username);
+                return addNewClient((Client)usr);
+            case "2":
+                usr = new Worker(login, password, username);
+                return addNewWorker((Worker)usr);
+            default:
+                throw new NoSuchElementException("Incorrect Role!");
+        }
     }
 
     public void deleteUser(@NotNull final String userId) throws NoSuchElementException {
@@ -81,39 +107,36 @@ public class ServiceImpl {
         administratorRepository.deleteById(Long.parseLong(userId));
     }
 
-    public boolean loginClient(String login, String pwd) {
+    private boolean loginClient(String login, String pwd) {
         Client client = clientRepository.getClientByLogin(login).orElse(null);
         if (client != null)
             return client.loginUser(pwd);
         return false;
     }
 
-    public boolean loginWorker(String login, String pwd) {
+    private boolean loginWorker(String login, String pwd) {
         Worker worker = workerRepository.getWorkerByLogin(login).orElse(null);
         if (worker != null)
             return worker.loginUser(pwd);
         return false;
     }
 
-    public boolean loginAdministrator(String login, String pwd) {
+    private boolean loginAdministrator(String login, String pwd) {
         Administrator admin = administratorRepository.getAdministratorByLogin(login).orElse(null);
         if (admin != null)
             return admin.loginUser(pwd);
         return false;
     }
 
-    public void addNewClient(Client client){
-        //TODO
-        clientRepository.save(client);
+    private Long addNewClient(Client client){
+        return clientRepository.save(client).getId();
     }
 
-    public void addNewWorker(Worker worker){
-        // TODO
-        workerRepository.save(worker);
+    private Long addNewWorker(Worker worker){
+        return workerRepository.save(worker).getId();
     }
 
-    public void addNewOperator(Administrator admin){
-        //TODO
-        administratorRepository.save(admin);
+    private Long addNewAdministrator(Administrator admin){
+        return administratorRepository.save(admin).getId();
     }
 }

@@ -10,6 +10,6 @@ import java.util.Optional;
 @Component
 public interface ClientRepository extends UserRepository<Client> {
 
-    @Query("select U from Client U where U.login = :login and TypeUser = 1")
+    @Query("select U from Client U where U.login = :login and type_user = 1")
     Optional<Client> getClientByLogin(@Param("login") String login);
 }

@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "user")
-@DiscriminatorColumn(name="typeUser",
+@DiscriminatorColumn(name="type_user",
         discriminatorType = DiscriminatorType.INTEGER)
 public class User {
     @Id
@@ -16,8 +16,19 @@ public class User {
     private String login;
     private String password;
     private String userName;
-    @Column(name="typeUser",insertable=false, updatable=false)
+    @Column(name="type_user",insertable=false, updatable=false)
     private int typeUser;
+
+    public User() {
+
+    }
+
+    public User(final String login, final String password, final String userName, final int typeUser) {
+        this.login = login;
+        this.password = password;
+        this.userName = userName;
+        this.typeUser = typeUser;
+    }
 
     public int getTypeUser() {
         return this.typeUser;

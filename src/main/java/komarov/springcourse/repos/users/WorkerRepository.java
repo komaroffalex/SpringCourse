@@ -10,6 +10,6 @@ import java.util.Optional;
 @Component
 public interface WorkerRepository extends UserRepository<Worker> {
 
-    @Query("select U from Worker U where U.login = :login and TypeUser = 2")
+    @Query("select U from Worker U where U.login = :login and type_user = 2")
     Optional<Worker> getWorkerByLogin(@Param("login") String login);
 }

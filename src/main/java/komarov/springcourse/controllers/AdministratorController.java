@@ -1,6 +1,7 @@
 package komarov.springcourse.controllers;
 
 import komarov.springcourse.entities.users.Administrator;
+import komarov.springcourse.entities.users.User;
 import komarov.springcourse.service.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,9 +38,9 @@ public class AdministratorController {
     @RequestMapping(value = "/user/all", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<Administrator>> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers() {
         try {
-            return new ResponseEntity<>(service.getAllAdministrators(), HttpStatus.OK);
+            return new ResponseEntity<>(service.getAllUsers(), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -89,12 +90,19 @@ public class AdministratorController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<String> upsertNewUser(@RequestParam String login, @RequestParam String password,
-                                                @RequestParam String username) {
-        if (null == login || null == password || null == username) {
+                                                @RequestParam String username, @RequestParam String role) {
+        if (null == login || null == password || null == username || null == role) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        final Long newId = service.upsertUser(login, password, username);
-        final String resp = "{\"id\":" + newId.toString() + "}";
-        return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        if ("".equals(login) || "".equals(password) || "".equals(username) || "".equals(role)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertUser(login, password, username, role);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
