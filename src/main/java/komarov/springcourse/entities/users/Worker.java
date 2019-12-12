@@ -2,6 +2,7 @@ package komarov.springcourse.entities.users;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("2")

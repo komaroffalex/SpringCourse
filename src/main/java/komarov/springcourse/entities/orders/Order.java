@@ -5,8 +5,7 @@ import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.Worker;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "orders")
@@ -99,5 +98,30 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public static Long getLeastBusyWorkerId(final List<Order> orders, final List<Worker> workers) {
+        if (orders.size() == 0) return workers.get(0).getId();
+        Map<Long, Integer> ordersWorkersMap = new HashMap<>();
+        for (Order ord : orders) {
+            Long workerId = ord.worker.getId();
+            if (ordersWorkersMap.containsKey(workerId)) {
+                ordersWorkersMap.put(workerId, ordersWorkersMap.get(workerId) + 1);
+            } else {
+                ordersWorkersMap.put(workerId, 0);
+            }
+        }
+        for (Worker it : workers) {
+            if (!ordersWorkersMap.containsKey(it.getId())) return it.getId();
+        }
+        Long leastBusyWorkerId = -1L;
+        Integer minimalOrdersTaken = 1000;
+        for (Long key : ordersWorkersMap.keySet()) {
+            if (ordersWorkersMap.get(key) < minimalOrdersTaken) {
+                minimalOrdersTaken = ordersWorkersMap.get(key);
+                leastBusyWorkerId = key;
+            }
+        }
+        return leastBusyWorkerId;
     }
 }

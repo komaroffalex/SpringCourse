@@ -1,6 +1,9 @@
 package komarov.springcourse.service;
 
 import komarov.springcourse.entities.Role;
+import komarov.springcourse.entities.Status;
+import komarov.springcourse.entities.orders.Food;
+import komarov.springcourse.entities.orders.Order;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.User;
@@ -13,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 public class ServiceImpl {
@@ -58,9 +59,16 @@ public class ServiceImpl {
      * @param userId specifies user's ID
      * @return user entity
      */
-    public Administrator findUser(@NotNull final String userId) throws NoSuchElementException {
-        return administratorRepository.findById(Long.parseLong(userId)).orElseThrow(()
-                -> new NoSuchElementException("User is not present!"));
+    public User findUser(@NotNull final String userId) throws NoSuchElementException {
+        if (administratorRepository.findById(Long.parseLong(userId)).isPresent()) {
+            return administratorRepository.findById(Long.parseLong(userId)).get();
+        } else if (clientRepository.findById(Long.parseLong(userId)).isPresent()) {
+            return clientRepository.findById(Long.parseLong(userId)).get();
+        } else if (workerRepository.findById(Long.parseLong(userId)).isPresent()) {
+            return workerRepository.findById(Long.parseLong(userId)).get();
+        } else {
+            throw new NoSuchElementException("User not found!");
+        }
     }
 
     public List<Administrator> getAllAdministrators() throws NoSuchElementException {
@@ -144,5 +152,91 @@ public class ServiceImpl {
 
     private Long addNewAdministrator(Administrator admin){
         return administratorRepository.save(admin).getId();
+    }
+
+    public List<Order> getAllOrders(){
+        return orderRepository.findAll();
+    }
+
+    public Order findOrder(@NotNull final String orderId) throws NoSuchElementException {
+        return orderRepository.findById(Long.parseLong(orderId)).orElseThrow(()
+                -> new NoSuchElementException("Order is not present!"));
+    }
+
+    public Long upsertOrder(@NotNull final String delTime, @NotNull final String foodIds,
+                            @NotNull final String address, @NotNull final String clientId) throws NoSuchElementException {
+        final Order order = new Order();
+        List<String> foods = Arrays.asList(foodIds.split("\\s*,\\s*"));
+        List<String> foodNamesList = new ArrayList<>();
+        float totalCost = 0;
+        for (String id : foods) {
+            Optional<Food> item = foodRepository.findById(Long.parseLong(id));
+            if (item.isPresent()) {
+                foodNamesList.add(item.get().getName());
+                totalCost = totalCost + item.get().getFoodCost();
+            } else {
+                throw new NoSuchElementException("Specified food id is not present!");
+            }
+        }
+        String foodNamesStr = String.join(", ", foodNamesList);
+        Optional<Client> client = clientRepository.findById(Long.parseLong(clientId));
+        if (!client.isPresent()) {
+            throw new NoSuchElementException("Client is not registered!");
+        }
+        if (workerRepository.findAll().size() == 0) throw new NoSuchElementException("Not enough workers!");
+        Long leastBusyWorkerId = Order.getLeastBusyWorkerId(orderRepository.findAll(), workerRepository.findAll());
+        order.setFood(foodNamesStr);
+        order.setAddress(address);
+        order.setClient(client.get());
+        order.setDeliveryTime(delTime);
+        order.setCost(totalCost);
+        order.setWorker(workerRepository.findById(leastBusyWorkerId).get());
+        order.setOrderStatus(Status.SUBMITTED);
+        return orderRepository.save(order).getId();
+    }
+
+    public void deleteOrder(@NotNull final String orderId) throws NoSuchElementException {
+        if (orderRepository.findById(Long.parseLong(orderId)).isPresent()) {
+            orderRepository.deleteById(Long.parseLong(orderId));
+        } else {
+            throw new NoSuchElementException("Order not found!");
+        }
+    }
+
+    public Long changeOrderStatus(@NotNull final String orderId, @NotNull final String newStatusId)
+                                                                throws NoSuchElementException {
+        Optional<Order> order = orderRepository.findById(Long.parseLong(orderId));
+        if (order.isPresent()) {
+            Order ord = order.get();
+            ord.setOrderStatus(Status.valueOf(Integer.parseInt(newStatusId)));
+            orderRepository.deleteById(Long.parseLong(orderId));
+            return orderRepository.save(ord).getId();
+        } else {
+            throw new NoSuchElementException("Order not found!");
+        }
+    }
+
+    public List<Food> getAllFood(){
+        return foodRepository.findAll();
+    }
+
+    public Food findFood(@NotNull final String foodId) throws NoSuchElementException {
+        return foodRepository.findById(Long.parseLong(foodId)).orElseThrow(()
+                -> new NoSuchElementException("Food is not present!"));
+    }
+
+    public Long upsertFood(@NotNull final String foodname, @NotNull final String foodcost) {
+        Food food = new Food();
+        food.setFoodCost(Float.parseFloat(foodcost));
+        food.setName(foodname);
+        return foodRepository.save(food).getId();
+    }
+
+    public void deleteFood(@NotNull final String foodId) throws NoSuchElementException {
+        if (foodRepository.findById(Long.parseLong(foodId)).isPresent()) {
+            foodRepository.deleteById(Long.parseLong(foodId));
+        } else {
+            throw new NoSuchElementException("Food not found!");
+        }
     }
 }

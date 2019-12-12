@@ -1,5 +1,7 @@
 package komarov.springcourse.controllers;
 
+import komarov.springcourse.entities.orders.Food;
+import komarov.springcourse.entities.orders.Order;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.User;
 import komarov.springcourse.service.ServiceImpl;
@@ -55,7 +57,7 @@ public class AdministratorController {
     @RequestMapping(value = "/user", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Administrator> getUserById(@RequestParam String id) {
+    public ResponseEntity<User> getUserById(@RequestParam String id) {
         if (null == id) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -103,6 +105,130 @@ public class AdministratorController {
             return new ResponseEntity<>(resp, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Get all orders.
+     *
+     * @return list of all orders
+     */
+    @RequestMapping(value = "/order/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Order>> getAllOrders() {
+        try {
+            return new ResponseEntity<>(service.getAllOrders(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewOrder(   @RequestParam String deltime, @RequestParam String foodids,
+                                                    @RequestParam String address, @RequestParam String clientid) {
+        if (null == deltime || null == foodids || null == address || null == clientid) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(deltime) || "".equals(foodids) || "".equals(address) || "".equals(clientid)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertOrder(deltime, foodids, address, clientid);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeOrderById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteOrder(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Order> getOrderById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(service.findOrder(id), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/food/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Food>> getAllFood() {
+        try {
+            return new ResponseEntity<>(service.getAllFood(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/food", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewFood(   @RequestParam String foodname, @RequestParam String foodcost) {
+        if (null == foodname || null == foodcost) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(foodname) || "".equals(foodcost)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertFood(foodname, foodcost);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/food", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeFoodById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteFood(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/food", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Food> getFoodById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(service.findFood(id), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
