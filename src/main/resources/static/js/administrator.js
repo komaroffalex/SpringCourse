@@ -1,5 +1,5 @@
-var messageApiGet = Vue.resource('/user?id={id}');
-var messageApiGetAll = Vue.resource('/user/all');
+var messageApiGet = Vue.resource('/admin/user?id={id}');
+var messageApiGetAll = Vue.resource('/admin/user/all');
 
 Vue.component('message-form', {
     props: ['messages'],
@@ -15,6 +15,7 @@ Vue.component('message-form', {
     },
     template:
         '<div>' +
+            '<h5>Add new user</h5>' +
             '<div>' +
                 '<input type="text" placeholder="Write login" v-model="login" />' +
                 '<input type="text" placeholder="Write password" v-model="password" />' +
@@ -41,7 +42,7 @@ Vue.component('message-form', {
             } else if (document.getElementById('userChoice3').checked == true) {
                 role = '2';
             }
-            Vue.http.put('http://localhost:8080/user?login=' + this.login + '&password=' +
+            Vue.http.put('http://localhost:8080/admin/user?login=' + this.login + '&password=' +
                     this.password + '&username=' + this.username + '&role=' + role).then(result =>
                 result.json().then(data => {
                     console.log(data);
@@ -69,10 +70,12 @@ Vue.component('message-form', {
 
 Vue.component('message-row', {
     props: ['message', 'messages'],
-    template: '<div>{{ message.id }}' + ' ' + '{{ message.login }}' +
-                '{{ message.password }}' + ' ' + '{{ message.userName }}' +
-                '{{ message.typeUser }}' +
-                '<span>' + '<input type="button" value="Remove user" v-on:click="del" />' + '</span>' + '</div>',
+    template:   '<tr>' +
+                '<td>{{ message.id }}</td><td>{{ message.login }}</td>' +
+                '<td>{{ message.password }}</td><td>{{ message.userName }}</td>' +
+                '<td>{{ message.typeUser }}</td>' +
+                '<td>' + '<input type="button" value="Remove user" v-on:click="del" />' + '</td>' +
+                '</tr>',
     methods: {
         del: function(){
             messageApiGet.remove({id: this.message.id}).then(result => {
@@ -89,9 +92,14 @@ Vue.component('messages-list', {
     props: ['messages'],
     template:
         '<div id="app">' +
+        '<h4>Edit users</h4>' +
         '<message-form :messages="messages" />' +
+        '<h5>Registered users</h5>' +
+        '<table id="table" style="width:50%">' +
+        '<tr><th>Id</th><th>Login</th><th>Password</th><th>UserName</th><th>Role</th><th>Remove</th></tr>' +
         '<message-row v-for="message in messages" :key="message.id" :message="message" :messages="messages" />' +
-        '<span>' + '<input type="button" value="Index Page" v-on:click="newpage" />' + '</span>' +
+        '</table>' +
+        '<span>' + '<input type="button" value="Log in Page" v-on:click="newpage" />' + '</span>' +
         '</div>',
     created: function() {
         messageApiGetAll.get({}).then(result => {

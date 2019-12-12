@@ -102,9 +102,15 @@ public class ServiceImpl {
     }
 
     public void deleteUser(@NotNull final String userId) throws NoSuchElementException {
-        administratorRepository.findById(Long.parseLong(userId)).orElseThrow(()
-                -> new NoSuchElementException("User is not present!"));
-        administratorRepository.deleteById(Long.parseLong(userId));
+        if (administratorRepository.findById(Long.parseLong(userId)).isPresent()) {
+            administratorRepository.deleteById(Long.parseLong(userId));
+        } else if (clientRepository.findById(Long.parseLong(userId)).isPresent()) {
+            clientRepository.deleteById(Long.parseLong(userId));
+        } else if (workerRepository.findById(Long.parseLong(userId)).isPresent()) {
+            workerRepository.deleteById(Long.parseLong(userId));
+        } else {
+            throw new NoSuchElementException("User not found!");
+        }
     }
 
     private boolean loginClient(String login, String pwd) {
