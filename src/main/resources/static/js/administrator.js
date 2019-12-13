@@ -142,6 +142,8 @@ Vue.component('order-row', {
         '<td>{{ order.food }}</td><td>{{ order.orderStatus }}</td>' +
         '<td>{{ order.worker.id }}</td><td>{{ order.client.id }}</td>' +
         '<td>' + '<input type="button" value="Remove order" v-on:click="del_order" />' + '</td>' +
+        '<td>' + '<input type="button" value="Approve order" v-on:click="app_order" />' + '</td>' +
+        '<td>' + '<input type="button" value="Deny order" v-on:click="deny_order" />' + '</td>' +
         '</tr>',
     methods: {
         del_order: function(){
@@ -151,6 +153,22 @@ Vue.component('order-row', {
                     console.log(result.status)
                 }
             })
+        },
+        app_order: function() {
+            Vue.http.put('http://localhost:8080/admin/order/status?orderid=' + this.order.id + '&newstatus=' +
+                '1').then(result =>
+                result.json().then(data => {
+                    console.log(data);
+                })
+            );
+        },
+        deny_order: function() {
+            Vue.http.put('http://localhost:8080/admin/order/status?orderid=' + this.order.id + '&newstatus=' +
+                '3').then(result =>
+                result.json().then(data => {
+                    console.log(data);
+                })
+            );
         }
     }
 });
@@ -307,6 +325,8 @@ Vue.component('reservation-row', {
         '<td>{{ reservation.cost }}</td><td>{{ reservation.status }}</td>' +
         '<td>{{ reservation.client.id }}</td>' +
         '<td>' + '<input type="button" value="Remove reservation" v-on:click="del_reservation" />' + '</td>' +
+        '<td>' + '<input type="button" value="Approve reservation" v-on:click="app_reservation" />' + '</td>' +
+        '<td>' + '<input type="button" value="Deny reservation" v-on:click="deny_reservation" />' + '</td>' +
         '</tr>',
     methods: {
         del_reservation: function(){
@@ -316,6 +336,22 @@ Vue.component('reservation-row', {
                     console.log(result.status)
                 }
             })
+        },
+        app_reservation: function() {
+            Vue.http.put('http://localhost:8080/admin/reservation/status?reservationid=' + this.reservation.id + '&newstatus=' +
+                '2').then(result =>
+                result.json().then(data => {
+                    console.log(data);
+                })
+            );
+        },
+        deny_reservation: function() {
+            Vue.http.put('http://localhost:8080/admin/reservation/status?reservationid=' + this.reservation.id + '&newstatus=' +
+                '3').then(result =>
+                result.json().then(data => {
+                    console.log(data);
+                })
+            );
         }
     }
 });
@@ -334,7 +370,7 @@ Vue.component('messages-list', {
         '<h4>Edit orders</h4>' +
         '<order-form :orders="orders" />' +
         '<h5>Registered orders</h5>' +
-        '<table id="table2" style="width:50%">' +
+        '<table id="table2" style="width:70%">' +
         '<tr><th>Id</th><th>Address</th><th>Cost</th><th>DeliveryTime</th><th>Food</th><th>OrderStatus</th>' +
         '<th>WorkerId</th><th>ClientId</th><th>Remove</th></tr>'+
         '<order-row v-for="order in orders" :key="order.id" :order="order" :orders="orders" />' +

@@ -321,6 +321,11 @@ public class ServiceImpl {
         if (reservationOpt.isPresent()) {
             Reservation reservation = reservationOpt.get();
             reservation.setStatus(Status.valueOf(Integer.parseInt(newStatusId)));
+            if(reservation.getStatus() == Status.READY) {
+                tableRepository.findById(reservation.getTable().getId()).get().setIsOccupied(1);
+            } else if (reservation.getStatus() == Status.DENIED) {
+                tableRepository.findById(reservation.getTable().getId()).get().setIsOccupied(0);
+            }
             reservationRepository.deleteById(Long.parseLong(reservationId));
             return reservationRepository.save(reservation).getId();
         } else {

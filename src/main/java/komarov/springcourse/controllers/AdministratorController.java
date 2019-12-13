@@ -147,6 +147,25 @@ public class AdministratorController {
         }
     }
 
+    @RequestMapping(value = "/order/status", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewOrderStatus(@RequestParam String orderid, @RequestParam String newstatus) {
+        if (null == orderid || null == newstatus) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(orderid) || "".equals(newstatus)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.changeOrderStatus(orderid, newstatus);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @RequestMapping(value = "/order", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -319,6 +338,26 @@ public class AdministratorController {
         }
         try {
             final Long newId = service.upsertReservation(reservationtime, persons, tableid, clientid);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/reservation/status", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewReservationStatus( @RequestParam String reservationid,
+                                                              @RequestParam String newstatus) {
+        if (null == reservationid || null == newstatus) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(reservationid) || "".equals(newstatus)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.changeReservationStatus(reservationid, newstatus);
             final String resp = "{\"id\":" + newId.toString() + "}";
             return new ResponseEntity<>(resp, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
