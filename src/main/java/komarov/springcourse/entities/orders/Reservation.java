@@ -10,7 +10,7 @@ import java.util.Date;
 @Table(name = "reservations")
 public class Reservation {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     @Column(name = "resTime")
     private String reservationTime;

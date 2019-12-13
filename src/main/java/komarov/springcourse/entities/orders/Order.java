@@ -11,7 +11,7 @@ import java.util.*;
 @Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     @Column(name = "delTime")
     private String deliveryTime;
