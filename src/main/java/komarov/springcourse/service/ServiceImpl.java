@@ -4,6 +4,8 @@ import komarov.springcourse.entities.Role;
 import komarov.springcourse.entities.Status;
 import komarov.springcourse.entities.orders.Food;
 import komarov.springcourse.entities.orders.Order;
+import komarov.springcourse.entities.orders.Reservation;
+import komarov.springcourse.entities.orders.TableEntity;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.Client;
 import komarov.springcourse.entities.users.User;
@@ -237,6 +239,92 @@ public class ServiceImpl {
             foodRepository.deleteById(Long.parseLong(foodId));
         } else {
             throw new NoSuchElementException("Food not found!");
+        }
+    }
+
+    public List<TableEntity> getAllTables(){
+        return tableRepository.findAll();
+    }
+
+    public TableEntity findTable(@NotNull final String tableId) throws NoSuchElementException {
+        return tableRepository.findById(Long.parseLong(tableId)).orElseThrow(()
+                -> new NoSuchElementException("Table is not present!"));
+    }
+
+    public Long upsertTable(@NotNull final String seats, @NotNull final String location) {
+        TableEntity tableEntity = new TableEntity();
+        tableEntity.setSeats(Integer.parseInt(seats));
+        tableEntity.setLocation(location);
+        tableEntity.setIsOccupied(0);
+        return tableRepository.save(tableEntity).getId();
+    }
+
+    public void deleteTable(@NotNull final String tableId) throws NoSuchElementException {
+        if (tableRepository.findById(Long.parseLong(tableId)).isPresent()) {
+            tableRepository.deleteById(Long.parseLong(tableId));
+        } else {
+            throw new NoSuchElementException("Table not found!");
+        }
+    }
+
+    public Long changeTableStatus(@NotNull final String tableId, @NotNull final String isOccupied)
+            throws NoSuchElementException {
+        Optional<TableEntity> tableOpt = tableRepository.findById(Long.parseLong(tableId));
+        if (tableOpt.isPresent()) {
+            TableEntity table = tableOpt.get();
+            table.setIsOccupied(Integer.parseInt(isOccupied));
+            tableRepository.deleteById(Long.parseLong(tableId));
+            return tableRepository.save(table).getId();
+        } else {
+            throw new NoSuchElementException("Table not found!");
+        }
+    }
+
+    public List<Reservation> getAllReservations(){
+        return reservationRepository.findAll();
+    }
+
+    public Reservation findReservation(@NotNull final String reservationId) throws NoSuchElementException {
+        return reservationRepository.findById(Long.parseLong(reservationId)).orElseThrow(()
+                -> new NoSuchElementException("Reservation is not present!"));
+    }
+
+    public Long upsertReservation(@NotNull final String reservationTime, @NotNull final String persons,
+                                  @NotNull final String tableId, @NotNull final String clientId)
+            throws NoSuchElementException {
+        Reservation reservation = new Reservation();
+        reservation.setPersons(Integer.parseInt(persons));
+        reservation.setReservationTime(reservationTime);
+        Optional<TableEntity> tableOpt = tableRepository.findById(Long.parseLong(tableId));
+        Optional<Client> clientOpt = clientRepository.findById(Long.parseLong(clientId));
+        if(!tableOpt.isPresent() || !clientOpt.isPresent()) {
+            throw new NoSuchElementException("Specified table or client do not exist!");
+        }
+        reservation.setStatus(Status.SUBMITTED);
+        reservation.setTable(tableOpt.get());
+        reservation.setClient(clientOpt.get());
+        reservation.setCost(tableOpt.get().getCost());
+        return reservationRepository.save(reservation).getId();
+    }
+
+    public void deleteReservation(@NotNull final String reservationId) throws NoSuchElementException {
+        if (reservationRepository.findById(Long.parseLong(reservationId)).isPresent()) {
+            reservationRepository.deleteById(Long.parseLong(reservationId));
+        } else {
+            throw new NoSuchElementException("Reservation not found!");
+        }
+    }
+
+    public Long changeReservationStatus(@NotNull final String reservationId, @NotNull final String newStatusId)
+            throws NoSuchElementException {
+        Optional<Reservation> reservationOpt = reservationRepository.findById(Long.parseLong(reservationId));
+        if (reservationOpt.isPresent()) {
+            Reservation reservation = reservationOpt.get();
+            reservation.setStatus(Status.valueOf(Integer.parseInt(newStatusId)));
+            reservationRepository.deleteById(Long.parseLong(reservationId));
+            return reservationRepository.save(reservation).getId();
+        } else {
+            throw new NoSuchElementException("Reservation not found!");
         }
     }
 }

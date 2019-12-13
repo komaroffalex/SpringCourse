@@ -2,8 +2,11 @@ package komarov.springcourse.controllers;
 
 import komarov.springcourse.entities.orders.Food;
 import komarov.springcourse.entities.orders.Order;
+import komarov.springcourse.entities.orders.Reservation;
+import komarov.springcourse.entities.orders.TableEntity;
 import komarov.springcourse.entities.users.Administrator;
 import komarov.springcourse.entities.users.User;
+import komarov.springcourse.repos.ReservationRepository;
 import komarov.springcourse.service.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -227,6 +230,126 @@ public class AdministratorController {
         }
         try {
             return new ResponseEntity<>(service.findFood(id), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/table/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<TableEntity>> getAllTables() {
+        try {
+            return new ResponseEntity<>(service.getAllTables(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/table", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewTable(   @RequestParam String seats, @RequestParam String location) {
+        if (null == seats || null == location) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(seats) || "".equals(location)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertTable(seats, location);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/table", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeTableById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteTable(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/table", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<TableEntity> getTableById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(service.findTable(id), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/reservation/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Reservation>> getAllReservations() {
+        try {
+            return new ResponseEntity<>(service.getAllReservations(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewReservation( @RequestParam String reservationtime,
+                                                        @RequestParam String persons,
+                                                        @RequestParam String tableid, @RequestParam String clientid) {
+        if (null == reservationtime || null == persons || null == tableid || null == clientid) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(reservationtime) || "".equals(persons) || "".equals(tableid) || "".equals(clientid)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertReservation(reservationtime, persons, tableid, clientid);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeReservationById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteReservation(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Reservation> getReservationById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(service.findReservation(id), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

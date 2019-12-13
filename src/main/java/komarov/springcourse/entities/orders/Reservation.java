@@ -19,7 +19,7 @@ public class Reservation {
     @JoinColumn(name = "tableId")
     private TableEntity table;
     private float cost;
-    private String status;
+    private Status status;
     @ManyToOne
     @JoinColumn(name = "clientId")
     private Client client;
@@ -32,11 +32,11 @@ public class Reservation {
         this.client = client;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

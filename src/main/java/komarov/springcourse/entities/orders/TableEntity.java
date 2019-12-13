@@ -44,4 +44,8 @@ public class TableEntity {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public float getCost() {
+        return 75.0f*this.seats;
+    }
 }
