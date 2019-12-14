@@ -1,5 +1,6 @@
 var messageApiGet = Vue.resource('/admin/user?id={id}');
 var messageApiGetAll = Vue.resource('/admin/user/all');
+var messageApiGetCurrent = Vue.resource('/admin/user/this');
 var orderApiGet = Vue.resource('/admin/order?id={id}');
 var orderApiGetAll = Vue.resource('/admin/order/all');
 var foodApiGet = Vue.resource('/admin/food?id={id}');
@@ -358,8 +359,14 @@ Vue.component('reservation-row', {
 
 Vue.component('messages-list', {
     props: ['messages', 'orders', 'foods', 'tables', 'reservations'],
+    data: function() {
+        return {
+            curruser: ''
+        }
+    },
     template:
         '<div id="app">' +
+        '<h4>You are logged in as</h4>' + '<p id="puser">' + this.curruser + '</p>' +
         '<h4>Edit users</h4>' +
         '<message-form :messages="messages" />' +
         '<h5>Registered users</h5>' +
@@ -430,6 +437,15 @@ Vue.component('messages-list', {
                 data.forEach(reservation => this.reservations.push(reservation))
             )
         });
+        messageApiGetCurrent.get({}).then(result => {
+            console.log(result);
+            result.json().then(data => {
+                    this.curruser = data.userName;
+                    console.log(data);
+                    document.getElementById("puser").innerHTML = data.userName;
+                }
+            )
+        })
     },
     methods: {
         newpage: function(){

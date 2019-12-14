@@ -51,6 +51,17 @@ public class AdministratorController {
         }
     }
 
+    @RequestMapping(value = "/user/this", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<User> getLoggedInUser() {
+        try {
+            return new ResponseEntity<>(service.getCurrentlyLoggedInUser(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     /**
      * Get user by the specified ID.
      *

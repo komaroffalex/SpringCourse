@@ -22,6 +22,8 @@ import java.util.*;
 
 @Service
 public class ServiceImpl {
+    private User currentlyLoggedInUser;
+
     private TableRepository tableRepository;
     private FoodRepository foodRepository;
     private OrderRepository orderRepository;
@@ -42,6 +44,10 @@ public class ServiceImpl {
         this.orderRepository = orderRepository;
         this.tableRepository = tableRepository;
         this.reservationRepository = reservationRepository;
+    }
+
+    public User getCurrentlyLoggedInUser() {
+        return this.currentlyLoggedInUser;
     }
 
     public int authenticate(String login, String pwd) {
@@ -125,22 +131,34 @@ public class ServiceImpl {
 
     private boolean loginClient(String login, String pwd) {
         Client client = clientRepository.getClientByLogin(login).orElse(null);
-        if (client != null)
-            return client.loginUser(pwd);
+        if (client != null) {
+            if (client.loginUser(pwd)) {
+                currentlyLoggedInUser = client;
+                return true;
+            }
+        }
         return false;
     }
 
     private boolean loginWorker(String login, String pwd) {
         Worker worker = workerRepository.getWorkerByLogin(login).orElse(null);
-        if (worker != null)
-            return worker.loginUser(pwd);
+        if (worker != null) {
+            if (worker.loginUser(pwd)) {
+                currentlyLoggedInUser = worker;
+                return true;
+            }
+        }
         return false;
     }
 
     private boolean loginAdministrator(String login, String pwd) {
         Administrator admin = administratorRepository.getAdministratorByLogin(login).orElse(null);
-        if (admin != null)
-            return admin.loginUser(pwd);
+        if (admin != null) {
+            if (admin.loginUser(pwd)) {
+                currentlyLoggedInUser = admin;
+                return true;
+            }
+        }
         return false;
     }
 
