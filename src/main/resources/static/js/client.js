@@ -1,11 +1,16 @@
-var orderApiGet = Vue.resource('/admin/order?id={id}');
-var orderApiGetAll = Vue.resource('/admin/order/all');
-var foodApiGet = Vue.resource('/admin/food?id={id}');
-var foodApiGetAll = Vue.resource('/admin/food/all');
-var tableApiGet = Vue.resource('/admin/table?id={id}');
-var tableApiGetAll = Vue.resource('/admin/table/all');
-var reservationApiGet = Vue.resource('/admin/reservation?id={id}');
-var reservationApiGetAll = Vue.resource('/admin/reservation/all');
+var orderApiGet = Vue.resource('/client/order?id={id}');
+var orderApiGetAll = Vue.resource('/client/order/all?id={id}');
+var foodApiGetAll = Vue.resource('/client/food/all');
+var tableApiGetAll = Vue.resource('/client/table/all');
+var reservationApiGet = Vue.resource('/client/reservation?id={id}');
+var reservationApiGetAll = Vue.resource('/client/reservation/all?id={id}');
+var currentUserGet = Vue.resource('/login/current');
+
+var request = new XMLHttpRequest();
+request.open('GET', '/login/current', false);  // `false` makes the request synchronous
+request.send(null);
+var myObj = JSON.parse(request.responseText);
+var currUserId = myObj.id;
 
 Vue.component('order-form', {
     props: ['orders'],
@@ -13,8 +18,7 @@ Vue.component('order-form', {
         return {
             deltime: '',
             foodids: '',
-            address: '',
-            login: ''
+            address: ''
         }
     },
     template:
@@ -24,21 +28,19 @@ Vue.component('order-form', {
         '<input type="text" placeholder="Write delivery time" v-model="deltime" />' +
         '<input type="text" placeholder="Write food ids (comma-separated)" v-model="foodids" />' +
         '<input type="text" placeholder="Write address" v-model="address" />' +
-        '<input type="text" placeholder="Specify your login" v-model="login" />' +
         '<input type="button" value="Save" v-on:click="save_order" />' +
         '</div>' +
         '</div>'
     ,
     methods: {
         save_order: function() {
-            Vue.http.put('http://localhost:8080/admin/order?deltime=' + this.deltime + '&foodids=' +
-                this.foodids + '&address=' + this.address + '&clientid=' + this.clientid).then(result =>
+            Vue.http.put('http://localhost:8080/client/order?deltime=' + this.deltime + '&foodids=' +
+                this.foodids + '&address=' + this.address + '&clientid=' + currUserId).then(result =>
                 result.json().then(data => {
                     console.log(data);
                     this.deltime = '';
                     this.foodids = '';
                     this.address = '';
-                    this.clientid = '';
                 })
             );
         }
@@ -54,8 +56,6 @@ Vue.component('order-row', {
         '<td>{{ order.food }}</td><td>{{ order.orderStatus }}</td>' +
         '<td>{{ order.worker.id }}</td><td>{{ order.client.id }}</td>' +
         '<td>' + '<input type="button" value="Remove order" v-on:click="del_order" />' + '</td>' +
-        '<td>' + '<input type="button" value="Approve order" v-on:click="app_order" />' + '</td>' +
-        '<td>' + '<input type="button" value="Deny order" v-on:click="deny_order" />' + '</td>' +
         '</tr>',
     methods: {
         del_order: function(){
@@ -65,54 +65,6 @@ Vue.component('order-row', {
                     console.log(result.status)
                 }
             })
-        },
-        app_order: function() {
-            Vue.http.put('http://localhost:8080/admin/order/status?orderid=' + this.order.id + '&newstatus=' +
-                '1').then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                })
-            );
-        },
-        deny_order: function() {
-            Vue.http.put('http://localhost:8080/admin/order/status?orderid=' + this.order.id + '&newstatus=' +
-                '3').then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                })
-            );
-        }
-    }
-});
-
-Vue.component('food-form', {
-    props: ['foods'],
-    data: function() {
-        return {
-            foodname: '',
-            foodcost: ''
-        }
-    },
-    template:
-        '<div>' +
-        '<h5>Add new Food</h5>' +
-        '<div>' +
-        '<input type="text" placeholder="Write food name" v-model="foodname" />' +
-        '<input type="text" placeholder="Write food cost" v-model="foodcost" />' +
-        '<input type="button" value="Save" v-on:click="save_food" />' +
-        '</div>' +
-        '</div>'
-    ,
-    methods: {
-        save_food: function() {
-            Vue.http.put('http://localhost:8080/admin/food?foodname=' + this.foodname + '&foodcost=' +
-                this.foodcost).then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                    this.foodname = '';
-                    this.foodcost = '';
-                })
-            );
         }
     }
 });
@@ -123,50 +75,9 @@ Vue.component('food-row', {
         '<tr>' +
         '<td>{{ food.id }}</td><td>{{ food.name }}</td>' +
         '<td>{{ food.foodCost }}</td>' +
-        '<td>' + '<input type="button" value="Remove food" v-on:click="del_food" />' + '</td>' +
         '</tr>',
     methods: {
-        del_food: function(){
-            foodApiGet.remove({id: this.food.id}).then(result => {
-                if(result.ok) {
-                    this.foods.splice(this.foods.indexOf(this.food), 1);
-                    console.log(result.status)
-                }
-            })
-        }
-    }
-});
 
-Vue.component('table-form', {
-    props: ['tables'],
-    data: function() {
-        return {
-            seats: '',
-            location: '',
-            isOccupied: ''
-        }
-    },
-    template:
-        '<div>' +
-        '<h5>Add new Table</h5>' +
-        '<div>' +
-        '<input type="text" placeholder="Specify table seats" v-model="seats" />' +
-        '<input type="text" placeholder="Specify table location" v-model="location" />' +
-        '<input type="button" value="Save" v-on:click="save_table" />' +
-        '</div>' +
-        '</div>'
-    ,
-    methods: {
-        save_table: function() {
-            Vue.http.put('http://localhost:8080/admin/table?seats=' + this.seats + '&location=' +
-                this.location).then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                    this.seats = '';
-                    this.location = '';
-                })
-            );
-        }
     }
 });
 
@@ -176,17 +87,9 @@ Vue.component('table-row', {
         '<tr>' +
         '<td>{{ table.id }}</td><td>{{ table.seats }}</td>' +
         '<td>{{ table.location }}</td><td>{{ table.isOccupied }}</td>' +
-        '<td>' + '<input type="button" value="Remove table" v-on:click="del_table" />' + '</td>' +
         '</tr>',
     methods: {
-        del_table: function(){
-            tableApiGet.remove({id: this.table.id}).then(result => {
-                if(result.ok) {
-                    this.tables.splice(this.tables.indexOf(this.table), 1);
-                    console.log(result.status)
-                }
-            })
-        }
+
     }
 });
 
@@ -196,8 +99,7 @@ Vue.component('reservation-form', {
         return {
             restime: '',
             persons: '',
-            tableid: '',
-            clientid: ''
+            tableid: ''
         }
     },
     template:
@@ -207,21 +109,19 @@ Vue.component('reservation-form', {
         '<input type="text" placeholder="Specify reservation time" v-model="restime" />' +
         '<input type="text" placeholder="Specify number of persons" v-model="persons" />' +
         '<input type="text" placeholder="Specify table id" v-model="tableid" />' +
-        '<input type="text" placeholder="Specify client id" v-model="clientid" />' +
         '<input type="button" value="Save" v-on:click="save_reservation" />' +
         '</div>' +
         '</div>'
     ,
     methods: {
         save_reservation: function() {
-            Vue.http.put('http://localhost:8080/admin/reservation?reservationtime=' + this.restime + '&persons=' +
-                this.persons + '&tableid=' + this.tableid + '&clientid=' + this.clientid).then(result =>
+            Vue.http.put('http://localhost:8080/client/reservation?reservationtime=' + this.restime + '&persons=' +
+                this.persons + '&tableid=' + this.tableid + '&clientid=' + currUserId).then(result =>
                 result.json().then(data => {
                     console.log(data);
                     this.restime = '';
                     this.persons = '';
                     this.tableid = '';
-                    this.clientid = '';
                 })
             );
         }
@@ -237,8 +137,6 @@ Vue.component('reservation-row', {
         '<td>{{ reservation.cost }}</td><td>{{ reservation.status }}</td>' +
         '<td>{{ reservation.client.id }}</td>' +
         '<td>' + '<input type="button" value="Remove reservation" v-on:click="del_reservation" />' + '</td>' +
-        '<td>' + '<input type="button" value="Approve reservation" v-on:click="app_reservation" />' + '</td>' +
-        '<td>' + '<input type="button" value="Deny reservation" v-on:click="deny_reservation" />' + '</td>' +
         '</tr>',
     methods: {
         del_reservation: function(){
@@ -248,30 +146,20 @@ Vue.component('reservation-row', {
                     console.log(result.status)
                 }
             })
-        },
-        app_reservation: function() {
-            Vue.http.put('http://localhost:8080/admin/reservation/status?reservationid=' + this.reservation.id + '&newstatus=' +
-                '2').then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                })
-            );
-        },
-        deny_reservation: function() {
-            Vue.http.put('http://localhost:8080/admin/reservation/status?reservationid=' + this.reservation.id + '&newstatus=' +
-                '3').then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                })
-            );
         }
     }
 });
 
 Vue.component('messages-list', {
     props: ['orders', 'foods', 'tables', 'reservations'],
+    data: function() {
+        return {
+            curruser: ''
+        }
+    },
     template:
         '<div id="app">' +
+        '<h4>Your id is:</h4>' + '<p id="puser">' + this.curruser + '</p>' +
         '<h4>Edit orders</h4>' +
         '<order-form :orders="orders" />' +
         '<h5>Registered orders</h5>' +
@@ -280,16 +168,12 @@ Vue.component('messages-list', {
         '<th>WorkerId</th><th>ClientId</th><th>Remove</th></tr>'+
         '<order-row v-for="order in orders" :key="order.id" :order="order" :orders="orders" />' +
         '</table>' +
-        '<h4>Edit food</h4>' +
-        '<food-form :foods="foods" />' +
-        '<h5>Registered food</h5>' +
+        '<h4>View food</h4>' +
         '<table id="table3" style="width:50%">' +
         '<tr><th>Id</th><th>FoodName</th><th>FoodCost</th></tr>' +
         '<food-row v-for="food in foods" :key="food.id" :food="food" :foods="foods" />' +
         '</table>' +
-        '<h4>Edit tables</h4>' +
-        '<table-form :tables="tables" />' +
-        '<h5>Registered tables</h5>' +
+        '<h4>View tables</h4>' +
         '<table id="table4" style="width:50%">' +
         '<tr><th>Id</th><th>Table seats</th><th>Location</th><th>isOccupied</th></tr>' +
         '<table-row v-for="table in tables" :key="table.id" :table="table" :tables="tables" />' +
@@ -305,7 +189,14 @@ Vue.component('messages-list', {
         '<span>' + '<input type="button" value="Log in Page" v-on:click="newpage" />' + '</span>' +
         '</div>',
     created: function() {
-        orderApiGetAll.get({}).then(result => {
+
+        Vue.http.get('http://localhost:8080/login/current').then(result =>
+            result.json().then(data => {
+                document.getElementById("puser").innerHTML = data.id;
+            })
+        );
+
+        orderApiGetAll.get({id: currUserId}).then(result => {
             console.log(result);
             result.json().then( data =>
                 data.forEach(order => this.orders.push(order))
@@ -323,7 +214,7 @@ Vue.component('messages-list', {
                 data.forEach(table => this.tables.push(table))
             )
         });
-        reservationApiGetAll.get({}).then(result => {
+        reservationApiGetAll.get({id: currUserId}).then(result => {
             console.log(result);
             result.json().then( data =>
                 data.forEach(reservation => this.reservations.push(reservation))

@@ -1,6 +1,9 @@
 package komarov.springcourse.controllers;
 
+import komarov.springcourse.entities.orders.Food;
 import komarov.springcourse.entities.orders.Order;
+import komarov.springcourse.entities.orders.Reservation;
+import komarov.springcourse.entities.orders.TableEntity;
 import komarov.springcourse.service.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +31,28 @@ public class ClientController {
         return "client.html";
     }
 
+    @RequestMapping(value = "/food/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Food>> getAllFood() {
+        try {
+            return new ResponseEntity<>(service.getAllFood(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/table/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<TableEntity>> getAllTables() {
+        try {
+            return new ResponseEntity<>(service.getAllTables(), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     /**
      * Get all orders.
      *
@@ -36,9 +61,25 @@ public class ClientController {
     @RequestMapping(value = "/order/all", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<List<Order>> getAllClientOrders(@RequestParam String id) {
         try {
-            return new ResponseEntity<>(service.getAllOrders(), HttpStatus.OK);
+            return new ResponseEntity<>(service.getAllClientOrders(id), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Get all client reservations.
+     *
+     * @return list of all client reservations
+     */
+    @RequestMapping(value = "/reservation/all", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<Reservation>> getAllClientReservations(@RequestParam String id) {
+        try {
+            return new ResponseEntity<>(service.getAllClientReservations(id), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -61,6 +102,57 @@ public class ClientController {
             return new ResponseEntity<>(resp, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeOrderById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteOrder(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> upsertNewReservation( @RequestParam String reservationtime,
+                                                        @RequestParam String persons,
+                                                        @RequestParam String tableid, @RequestParam String clientid) {
+        if (null == reservationtime || null == persons || null == tableid || null == clientid) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ("".equals(reservationtime) || "".equals(persons) || "".equals(tableid) || "".equals(clientid)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            final Long newId = service.upsertReservation(reservationtime, persons, tableid, clientid);
+            final String resp = "{\"id\":" + newId.toString() + "}";
+            return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> removeReservationById(@RequestParam String id) {
+        if (null == id) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            service.deleteReservation(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

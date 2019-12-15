@@ -50,4 +50,22 @@ public class DefaultController{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * Get currently logged in user
+     *
+     * @return user's entity
+     */
+    @RequestMapping(value = "/login/current", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<User> getLoggedInUser() {
+        try {
+            final User user = service.getCurrentlyLoggedInUser();
+            return user == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                    : new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

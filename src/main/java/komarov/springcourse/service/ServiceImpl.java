@@ -350,4 +350,12 @@ public class ServiceImpl {
             throw new NoSuchElementException("Reservation not found!");
         }
     }
+
+    public List<Order> getAllClientOrders(@NotNull final String clientId) {
+        return orderRepository.findOrdersByClient_Id(Long.parseLong(clientId));
+    }
+
+    public List<Reservation> getAllClientReservations(@NotNull final String clientId) {
+        return reservationRepository.findReservationsByClient_Id(Long.parseLong(clientId));
+    }
 }
