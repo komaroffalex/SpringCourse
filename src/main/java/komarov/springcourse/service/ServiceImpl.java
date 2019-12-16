@@ -358,4 +358,8 @@ public class ServiceImpl {
     public List<Reservation> getAllClientReservations(@NotNull final String clientId) {
         return reservationRepository.findReservationsByClient_Id(Long.parseLong(clientId));
     }
+
+    public List<Order> getAllWorkerOrders(@NotNull final String workerId) {
+        return orderRepository.findOrdersByWorker_Id(Long.parseLong(workerId));
+    }
 }

@@ -27,7 +27,7 @@ public class ClientController {
     }
 
     @RequestMapping("/user/page")
-    public String adminPage() {
+    public String clientPage() {
         return "client.html";
     }
 
